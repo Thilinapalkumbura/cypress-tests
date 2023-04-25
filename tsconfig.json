@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "lib": ["es5", "dom"],
+    "types": ["cypress", "node"],
+    "baseUrl": "cypress"
+  }
+}
