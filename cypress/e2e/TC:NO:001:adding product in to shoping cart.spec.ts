@@ -16,56 +16,79 @@ describe("Verify user can add product to the cart with correct idetails", () => 
   };
 
   before(() => {
-    cy.visit(Cypress.env('login_url'));
+    cy.visit(Cypress.env("login_url"));
   });
 
-  describe("Adding product to the cart", () => {
+  describe("Search the product and navigate product details page", () => {
     const productIndex = "2";
 
     it("should be able to search and filter the produts", () => {
+      // select drop deon value from search bar
       TopNavigation.selectValueFromSearchDropDown({
         optionValue: searchDropdownOptions.Book,
       });
+      // type values on search bar
       TopNavigation.sendValuesToSearchInput({ inputText: context.searchInput });
+      //click on the search submit button
       TopNavigation.clickOnSearchSubmitButton();
+      // select the cutomer review on search results page
       SearchResults.clickOnCustomerReview({
         startLevel: customerReviewLevel.FourStars,
       });
-
+      //check the language ckecbox on search results page
       SearchResults.selectLanguage({ language: languages.English });
-      SearchResults.getProductName({ productIndex}).then((ele) => {
+      // Save product name to verify
+      SearchResults.getProductName({ productIndex }).then((ele) => {
         context.productTitle = ele.trim().toLocaleLowerCase();
       });
     });
-    it('should be able to navigate product details page and edit details',()=>{
-      SearchResults.clickOnTheProductItem({ productIndex});
+    it("should be able to navigate product details page and edit details", () => {
+      //Click on the selected product name
+      SearchResults.clickOnTheProductItem({ productIndex });
+      //Save prodcut unit price
       ProductDetails.getUnitprice().then((ele) => {
         context.unitPrice = ele;
       });
-      ProductDetails.getProductTitle().then((ele)=>{
-        expect(ele.trim().toLocaleLowerCase()).to.equal(context.productTitle)
+      //Verify product title with the title whcih was in search results page
+      ProductDetails.getProductTitle().then((ele) => {
+        expect(ele.trim().toLocaleLowerCase()).to.equal(context.productTitle);
       });
-      ProductDetails.selectProductQuantity({quantitiy:'2'});
-    })
-    it('should be able to add product to the cart and verify details',()=>{
+      //change the product quantity
+      ProductDetails.selectProductQuantity({ quantitiy: "2" });
+    });
+  });
+
+  describe("Add product to the cart and verify product details", () => {
+    it("should be able to add product to the cart and verify details", () => {
+      //click on the add to cart button
       ProductDetails.clickOnAddToCartButton();
+      //click on the go to cart button
       ProductDetails.clickOnGoToCartButton();
-      ShoppingCart.getProductName().then((ele)=>{
+      // verify product name with the title which was in the details page
+      ShoppingCart.getProductName().then((ele) => {
         expect(ele.trim().toLocaleLowerCase()).contain(context.productTitle);
-      })
-      ShoppingCart.getProducQuantity().then((ele)=>{
-        expect(ele).to.equal('2');
-      })
-      ShoppingCart.getTotalprice().then((ele)=>{
-        expect(parseFloat(ele.split('$').pop())).to.equal(parseFloat(context.unitPrice.split('$').pop())*2);
-      })
-    })
-    it('should be able to clear cart',()=>{
+      });
+      // verify the product quantity
+      ShoppingCart.getProducQuantity().then((ele) => {
+        expect(ele).to.equal("2");
+      });
+      //Verify total price
+      ShoppingCart.getTotalprice().then((ele) => {
+        expect(parseFloat(ele.split("$").pop())).to.equal(
+          parseFloat(context.unitPrice.split("$").pop()) * 2
+        );
+      });
+    });
+    it("should be able to clear cart", () => {
       const price = "$0.00";
+      //click on the delete buton on product
       ShoppingCart.clickOnProductDeleteButton();
-      ShoppingCart.getTotalprice().then((ele)=>{
-        expect(parseFloat(ele.split('$').pop())).to.equal(parseFloat(price.split('$').pop()));
-      })
-    })
+      //verify total price after clear the cart
+      ShoppingCart.getTotalprice().then((ele) => {
+        expect(parseFloat(ele.split("$").pop())).to.equal(
+          parseFloat(price.split("$").pop())
+        );
+      });
+    });
   });
 });
